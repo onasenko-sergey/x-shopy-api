@@ -7,6 +7,7 @@ const index = require('./routes/index');
 
 const app = express();
 
+/* istanbul ignore if */
 if (app.get('env') !== 'test') app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
