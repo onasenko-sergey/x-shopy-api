@@ -7,5 +7,6 @@ const mlab = {
 };
 
 module.exports = {
-    mongoose_connection_string: `mongodb://${mlab.username}:${mlab.password}@${mlab.host}:${mlab.port}/${mlab.database}`
+    mongoose_connection_string: `mongodb://${mlab.username}:${mlab.password}@${mlab.host}:${mlab.port}/${mlab.database}`,
+    jwt_secret: 'top secret'
 };
