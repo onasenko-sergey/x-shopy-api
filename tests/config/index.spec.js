@@ -2,26 +2,27 @@ const chai = require('chai');
 const chaiSubset = require('chai-subset');
 chai.use(chaiSubset);
 const expect = chai.expect;
-const rewire = require('rewire');
+const mockery = require('mockery');
 
 describe('Function returned from configuration index file', function () {
+    const moduleUnderTest = '../../config';
     let configModule;
     const development = { development: 'development', variable: 1 };
     const production = { production: 'production', variable: 2 };
     const test = { test: 'test', variable: 3 };
-    let revert;
 
     before(function () {
-        configModule = rewire('../../config');
-        revert = configModule.__set__({
-            'development': development,
-            'production': production,
-            'test': test
-        });
+        mockery.registerAllowable(moduleUnderTest);
+        mockery.registerMock('./env/development', development);
+        mockery.registerMock('./env/production', production);
+        mockery.registerMock('./env/test', test);
+        mockery.enable({ useCleanCache: true });
+        configModule = require(moduleUnderTest);
     });
 
     after(function () {
-       revert();
+        mockery.disable();
+        mockery.deregisterAll();
     });
 
     context('called with no params', function () {
