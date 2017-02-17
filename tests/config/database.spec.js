@@ -1,23 +1,29 @@
 const expect = require('chai').expect;
-const proxyquire = require('proxyquire').noPreserveCache();
+const mockery = require('mockery');
 const sinon = require('sinon');
 
 describe('Database connection function', function () {
     let consoleErrorStub, mongooseStub = {};
-    let databaseModule, connection_string, connection_error, connection;
+    const connection_string = 'my_connection_string';
+    const connection_error = new Error('test');
+    let databaseModule, connection;
+    const moduleUnderTest = '../../config/database';
 
     before(function () {
-        databaseModule = proxyquire('../../config/database', { 'mongoose': mongooseStub });
-        connection_string = 'my_connection_string';
-        connection_error = new Error('test');
         const p = Promise.reject(connection_error);
         mongooseStub.connect = sinon.stub().returns(p);
+        mockery.registerAllowable(moduleUnderTest);
+        mockery.registerMock('mongoose', mongooseStub);
+        mockery.enable({ useCleanCache: true });
+        databaseModule = require(moduleUnderTest);
         consoleErrorStub = sinon.stub(console, 'error');
         connection = databaseModule(connection_string);
     });
 
     after(function () {
         consoleErrorStub.restore();
+        mockery.disable();
+        mockery.deregisterAll();
     });
 
     it('should call mongoose.connect with received connection string', function () {
